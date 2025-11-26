@@ -509,6 +509,12 @@ data:text/html,<script>alert(1)</script>
 #### 1. XSStrike
 **Type**: Python-based intelligent XSS scanner
 ```bash
+# Activate environnment
+# source ~/tools/xssstrike/bin/activate
+# cd /~tools/XSStrike
+# python3 xsstrike.py ...
+# deactivate
+
 # Basic scan
 xsstrike -u "https://target.com/search?q=test"
 

